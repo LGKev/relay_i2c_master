@@ -59,8 +59,13 @@ switch(incomingByte){
       break;
 
   case 97:
-    //changeAddress(0x90);
+    changeAddress(2);
     break;
+  case 106:
+    changeAddress(200);
+  break;
+
+    
 
   default:
       break;   
@@ -75,14 +80,14 @@ switch(incomingByte){
 /*   ==================     ==================     ==================  */
 
 void relayON(){
-  Wire.beginTransmission(1); // transmit to device #1
+  Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
   Wire.write(0x01);        // sends five bytes
   Wire.write(1);              // sends one byte
   Wire.endTransmission();    // stop transmitting
 }
 
 void relayOFF(){
-  Wire.beginTransmission(1); // transmit to device #1
+  Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
   Wire.write(0x01);        // sends five bytes to the ON register 
   Wire.write(0);              // sends one byte, set the bit in the ON register on (1) or off (0)
   Wire.endTransmission();    // stop transmitting
@@ -92,11 +97,13 @@ void relayOFF(){
 void changeAddress(int _address){
   Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
   Wire.write(0x00);        // sends five bytes to the 0x00 addredss
- // LATEST_ADDRESS = _address;
+  LATEST_ADDRESS = _address;
+  Serial.print("the current address is: ");
+  Serial.println(LATEST_ADDRESS);
   Wire.write(LATEST_ADDRESS);              // sends new address
   Wire.endTransmission();    // stop transmitting
 
-  Wire.begin(LATEST_ADDRESS);//
+  Wire.begin(LATEST_ADDRESS);// start wtih the new address.
 }
 
 void getStatus(){
