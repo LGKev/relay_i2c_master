@@ -8,6 +8,7 @@
 #include <Wire.h>
 
 int incomingByte = 0;   // for incoming serial data
+int LATEST_ADDRESS = 1;     //global so address can be changed by user.
 byte x = 0;
 
 void setup() {
@@ -58,7 +59,7 @@ switch(incomingByte){
       break;
 
   case 97:
-    changeAddress(0x90);
+    //changeAddress(0x90);
     break;
 
   default:
@@ -89,12 +90,13 @@ void relayOFF(){
 
 
 void changeAddress(int _address){
-  Wire.beginTransmission(1); // transmit to device #1
+  Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
   Wire.write(0x00);        // sends five bytes to the 0x00 addredss
-  Wire.write(_address);              // sends new address
+ // LATEST_ADDRESS = _address;
+  Wire.write(LATEST_ADDRESS);              // sends new address
   Wire.endTransmission();    // stop transmitting
 
-  Wire.begin(_address);//
+  Wire.begin(LATEST_ADDRESS);//
 }
 
 void getStatus(){
