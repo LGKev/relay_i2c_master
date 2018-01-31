@@ -9,6 +9,7 @@
 
 #define DEBUG_OUTPUT
 #define REGISTER_MAP_SIZE    4
+#define BIT0              0b00000001
 
 int incomingByte = 0;   // for incoming serial data
 int LATEST_ADDRESS = 1;     //global so address can be changed by user.
@@ -161,13 +162,17 @@ void getStatus() {
   while (Wire.available()) { // slave may send less than requested
     char c = Wire.read(); // receive a byte as character.
     byteCount++; 
-    if (byteCount == 2) { //we know that the byteCount needs to be 2 because 
+    if (byteCount == 3) { //we know that the byteCount needs to be 3 because 
       //we know the status Register is the 3rd element in the array
-      if (c == 0) {
-        Serial.println("relay off");
+      if (!(c & 0b00000000)) {
+        Serial.println("relay is off");
       }
-      else if (c == 1) {
-        Serial.println("relay on");
+    else if (c & BIT0) {
+        Serial.println("relay is on");
+      }
+      else{
+        Serial.print("???  ");
+        Serial.println(c);
       }
     }
   }
