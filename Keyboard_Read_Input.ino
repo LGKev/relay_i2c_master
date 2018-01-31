@@ -53,7 +53,7 @@ void loop() {
       digitalWrite(13, LOW);
 #ifdef DEBUG_OUTPUT
       Serial.println("OFF");
-       incomingByte = 0;
+      incomingByte = 0;
 #endif
       break;
 
@@ -61,7 +61,7 @@ void loop() {
       getStatus(); //"s"
 #ifdef DEBUG_OUTPUT
       Serial.println("Status");
-             incomingByte = 0;
+      incomingByte = 0;
 #endif
       break;
 
@@ -69,21 +69,21 @@ void loop() {
       changeAddress(2); //"a"
 #ifdef DEBUG_OUTPUT
       Serial.print("new address: 2");
-             incomingByte = 0;
+      incomingByte = 0;
 #endif
       break;
     case 106:
       changeAddress(200); //"j"
 #ifdef DEBUG_OUTPUT
       Serial.println("new addres: 200");
-             incomingByte = 0;
+      incomingByte = 0;
 #endif
       break;
     case 111:
       changeAddress(1); //"o"
 #ifdef DEBUG_OUTPUT
       Serial.println("new address: 1");
-             incomingByte = 0;
+      incomingByte = 0;
 #endif
       break;
     default:
@@ -141,31 +141,37 @@ void changeAddress(int _address) {
   Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
   Wire.write(0x03);        // sends five bytes to the 0x00 addredss
   LATEST_ADDRESS = _address;
-  #ifdef DEBUG_OUTPUT
+#ifdef DEBUG_OUTPUT
   Serial.print("the current address is: ");
   Serial.println(LATEST_ADDRESS);
-  #endif
+#endif
   Wire.write(LATEST_ADDRESS);              // sends new address
   Wire.endTransmission();    // stop transmitting
   Wire.begin(LATEST_ADDRESS);// start wtih the new address.
 }
 /*
-    @brief: Requests data from the slave by writing to the 
+    @brief: Requests data from the slave by writing to the
     @input:  none
     @returns: none
     @flags:  none
 */
 void getStatus() {
-//  Wire.requestFrom(LATEST_ADDRESS, REGISTER_MAP_SIZE);    // request 4 bytes from slave device #1
-  Wire.requestFrom(1, 4);    // request 4 bytes from slave device #1
+  Wire.requestFrom(LATEST_ADDRESS, REGISTER_MAP_SIZE);    // request 4 bytes from slave device #1
+  byte byteCount = 0; //way to know what bytes to throw away.
   while (Wire.available()) { // slave may send less than requested
     char c = Wire.read(); // receive a byte as character.
-    #ifdef DEBUG_OUTPUT
-    Serial.print(c);         // print the character
-    #endif
-    
+    byteCount++; 
+    if (byteCount == 2) { //we know that the byteCount needs to be 2 because 
+      //we know the status Register is the 3rd element in the array
+      if (c == 0) {
+        Serial.println("relay off");
+      }
+      else if (c == 1) {
+        Serial.println("relay on");
+      }
+    }
   }
-  #ifdef DEBUG_OUTPUT
+#ifdef DEBUG_OUTPUT
   Serial.println();
-  #endif
+#endif
 }
