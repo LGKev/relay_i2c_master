@@ -6,8 +6,10 @@
 */
 
 #include <Wire.h>
-
+#ifdef UNO
 #define DEBUG_OUTPUT
+#endif
+
 #define REGISTER_MAP_SIZE    4
 #define BIT0              0b00000001
 
@@ -16,8 +18,10 @@ int LATEST_ADDRESS = 1;     //global so address can be changed by user.
 byte x = 0;
 
 void setup() {
+
   Serial.begin(9600);
   Serial.println("master awake");
+
   pinMode(13, OUTPUT);
   Wire.begin(); // join i2c bus (address optional for master)
 }
