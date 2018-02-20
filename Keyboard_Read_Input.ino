@@ -5,7 +5,7 @@
 
 */
 
-#include <Wire.h>
+#include <TinyWire.h>
 #ifdef UNO
 #define DEBUG_OUTPUT
 #endif
@@ -23,7 +23,7 @@ void setup() {
   Serial.println("master awake");
 
   pinMode(13, OUTPUT);
-  Wire.begin(); // join i2c bus (address optional for master)
+  TinyWire.begin(); // join i2c bus (address optional for master)
 }
 
 void loop() {
@@ -113,10 +113,10 @@ void loop() {
     @flags:  none
 */
 void relayON() {
-  Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
-  Wire.write(0x01);        // sends five bytes
-  Wire.write(1);              // sends one byte
-  Wire.endTransmission();    // stop transmitting
+  TinyWire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
+  TinyWire.send(0x01);        // sends five bytes
+  TinyWire.send(1);              // sends one byte
+  TinyWire.endTransmission();    // stop transmitting
 }
 /*
     @brief: Starts I2C transmission with a LATEST_ADDRESS, writing to 0x01 register
@@ -127,10 +127,10 @@ void relayON() {
     @flags:  none
 */
 void relayOFF() {
-  Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
-  Wire.write(0x01);        // sends five bytes to the ON register
-  Wire.write(0);              // sends one byte, set the bit in the ON register on (1) or off (0)
-  Wire.endTransmission();    // stop transmitting
+  TinyWire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
+  TinyWire.send(0x01);        // sends five bytes to the ON register
+  TinyWire.send(0);              // sends one byte, set the bit in the ON register on (1) or off (0)
+  TinyWire.endTransmission();    // stop transmitting
 }
 
 /*
@@ -143,16 +143,16 @@ void relayOFF() {
     @flags:  none
 */
 void changeAddress(int _address) {
-  Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
-  Wire.write(0x03);        // sends five bytes to the 0x00 addredss
+  TinyWire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
+  TinyWire.send(0x03);        // sends five bytes to the 0x00 addredss
   LATEST_ADDRESS = _address;
 #ifdef DEBUG_OUTPUT
   Serial.print("the current address is: ");
   Serial.println(LATEST_ADDRESS);
 #endif
-  Wire.write(LATEST_ADDRESS);              // sends new address
-  Wire.endTransmission();    // stop transmitting
-  Wire.begin(LATEST_ADDRESS);// start wtih the new address.
+  TinyWire.send(LATEST_ADDRESS);              // sends new address
+  TinyWire.endTransmission();    // stop transmitting
+  TinyWire.begin(LATEST_ADDRESS);// start wtih the new address.
 }
 /*
     @brief: Requests data from the slave by writing to the
@@ -161,10 +161,10 @@ void changeAddress(int _address) {
     @flags:  none
 */
 void getStatus() {
-  Wire.requestFrom(LATEST_ADDRESS, REGISTER_MAP_SIZE);    // request 4 bytes from slave device #1
+  TinyWire.requestFrom(LATEST_ADDRESS, REGISTER_MAP_SIZE);    // request 4 bytes from slave device #1
   byte byteCount = 0; //way to know what bytes to throw away.
-  while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character.
+  while (TinyWire.available()) { // slave may send less than requested
+    char c = TinyWire.read(); // receive a byte as character.
     byteCount++; 
     if (byteCount == 3) { //we know that the byteCount needs to be 3 because 
       //we know the status Register is the 3rd element in the array
