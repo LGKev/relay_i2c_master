@@ -10,6 +10,7 @@
 #define DEBUG_OUTPUT
 #define REGISTER_MAP_SIZE    4
 #define BIT0              0b00000001
+#define I2C_ALIVE_INDICATOR   13  //LED13
 
 int incomingByte = 0;   // for incoming serial data
 int LATEST_ADDRESS = 0x01;     //global so address can be changed by user.
@@ -18,79 +19,29 @@ byte x = 0;
 void setup() {
   Serial.begin(9600);
   Serial.println("master awake");
-  pinMode(13, OUTPUT);
+  pinMode(I2C_ALIVE_INDICATOR, OUTPUT);
   Wire.begin(); // join i2c bus (address optional for master)
 }
 
 void loop() {
 
-  // getStatus();
-
-
-  // send data only when you receive data:
-  if (Serial.available() > 0) {
-    // read the incoming byte:
-    incomingByte = Serial.read();
-
-    // say what you got:
-#ifdef DEBUG_OUTPUT
-    Serial.print("I received: ");
-    Serial.println(incomingByte, DEC);
-#endif
-  }
-
-  switch (incomingByte) {
-    case 113:
-      relayON(); //"q"
-      digitalWrite(13, HIGH);
-#ifdef DEBUG_OUTPUT
-      Serial.println("ON");
-      incomingByte = 0;
-#endif
-      break;
-
-    case 112:
-      relayOFF(); //"p"
-      digitalWrite(13, LOW);
-#ifdef DEBUG_OUTPUT
-      Serial.println("OFF");
-      incomingByte = 0;
-#endif
-      break;
-
-    case 115:
-      getStatus(); //"s"
-#ifdef DEBUG_OUTPUT
-      Serial.println("Status");
-      incomingByte = 0;
-#endif
-      break;
-
-    case 97:
-      changeAddress(2); //"a"
-#ifdef DEBUG_OUTPUT
-      Serial.print("new address: 2");
-      incomingByte = 0;
-#endif
-      break;
-    case 106:
-      changeAddress(200); //"j"
-#ifdef DEBUG_OUTPUT
-      Serial.println("new addres: 200");
-      incomingByte = 0;
-#endif
-      break;
-    case 111:
-      changeAddress(1); //"o"
-#ifdef DEBUG_OUTPUT
-      Serial.println("new address: 1");
-      incomingByte = 0;
-#endif
-      break;
-    default:
-      break;
-  }
-
+  // what if serial is affecting i2c when reading keyboard input
+  //ltes just toggle the relay via i2c 2 seconds on 2 seconds off
+  //~~~~~~ RELAY ON
+  Wire.beginTransmission(0x01);
+  digitalWrite(I2C_ALIVE_INDICATOR, HIGH);
+  Wire.write(0x01);   //send to the on register
+  Wire.write(1);      //write a 1 to the ON REGISTER @ 0x01.
+  Wire.endTransmission();   //stop transmit condition.
+  delay(2000);
+  //~~~~~~ RELAY OFF
+  Wire.beginTransmission(0x01);
+  digitalWrite(I2C_ALIVE_INDICATOR, LOW);
+  Wire.write(0x01);   //send to the on register
+  Wire.write(0);      //write a 1 to the ON REGISTER @ 0x01.
+  Wire.endTransmission();   //stop transmit condition.
+  delay(2000);
+    
 }
 
 
