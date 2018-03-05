@@ -12,7 +12,7 @@
 #define BIT0              0b00000001
 
 int incomingByte = 0;   // for incoming serial data
-int LATEST_ADDRESS = 1;     //global so address can be changed by user.
+int LATEST_ADDRESS = 0x01;     //global so address can be changed by user.
 byte x = 0;
 
 void setup() {
