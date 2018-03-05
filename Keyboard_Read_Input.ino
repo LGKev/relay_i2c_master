@@ -33,14 +33,15 @@ void loop() {
   Wire.write(0x01);   //send to the on register
   Wire.write(1);      //write a 1 to the ON REGISTER @ 0x01.
   Wire.endTransmission();   //stop transmit condition.
-  delay(2000);
+  delay(200);
+  
   //~~~~~~ RELAY OFF
   Wire.beginTransmission(0x01);
   digitalWrite(I2C_ALIVE_INDICATOR, LOW);
   Wire.write(0x01);   //send to the on register
   Wire.write(0);      //write a 1 to the ON REGISTER @ 0x01.
   Wire.endTransmission();   //stop transmit condition.
-  delay(2000);
+  delay(200);
     
 }
 
