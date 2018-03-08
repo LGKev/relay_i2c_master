@@ -12,7 +12,7 @@
 #define BIT0              0b00000001
 
 int incomingByte = 0;   // for incoming serial data
-int LATEST_ADDRESS = 0x01;     //global so address can be changed by user.
+int LATEST_ADDRESS = 0x18;     //global so address can be changed by user.
 byte x = 0;
 
 void setup() {
@@ -111,7 +111,6 @@ void loop() {
 void relayON() {
   Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
   Wire.write(0x01);        // sends five bytes
-  Wire.write(1);              // sends one byte
   Wire.endTransmission();    // stop transmitting
 }
 /*
@@ -124,8 +123,7 @@ void relayON() {
 */
 void relayOFF() {
   Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
-  Wire.write(0x01);        // sends five bytes to the ON register
-  Wire.write(0);              // sends one byte, set the bit in the ON register on (1) or off (0)
+  Wire.write(0x00);              // sends one byte, set the bit in the ON register on (1) or off (0)
   Wire.endTransmission();    // stop transmitting
 }
 
@@ -161,16 +159,16 @@ void getStatus() {
   byte byteCount = 0; //way to know what bytes to throw away.
   while (Wire.available()) { // slave may send less than requested
     char c = Wire.read(); // receive a byte as character.
-    byteCount++; 
-    if (byteCount == 3) { //we know that the byteCount needs to be 3 because 
+    byteCount++;
+    if (byteCount == 3) { //we know that the byteCount needs to be 3 because
       //we know the status Register is the 3rd element in the array
       if (!(c & 0b00000000)) {
         Serial.println("relay is off");
       }
-    else if (c & BIT0) {
+      else if (c & BIT0) {
         Serial.println("relay is on");
       }
-      else{
+      else {
         Serial.print("???  ");
         Serial.println(c);
       }
