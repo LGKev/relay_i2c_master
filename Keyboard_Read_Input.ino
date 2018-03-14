@@ -69,21 +69,18 @@ void loop() {
     case 97:
       changeAddress(2); //"a"
 #ifdef DEBUG_OUTPUT
-      Serial.print("new address: 2");
       incomingByte = 0;
 #endif
       break;
     case 106:
-      changeAddress(200); //"j"
+      changeAddress(0x19); //"j"
 #ifdef DEBUG_OUTPUT
-      Serial.println("new addres: 200");
       incomingByte = 0;
 #endif
       break;
     case 111:
-      changeAddress(1); //"o"
+      changeAddress(0x18); //"o"
 #ifdef DEBUG_OUTPUT
-      Serial.println("new address: 1");
       incomingByte = 0;
 #endif
       break;
@@ -137,16 +134,32 @@ void relayOFF() {
     @flags:  none
 */
 void changeAddress(int _address) {
-  Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
-  Wire.write(0x03);        // sends five bytes to the 0x00 addredss
-  LATEST_ADDRESS = _address;
+	//check if valid address. 
+	if(_address > 0x07 && _address < 0x78){
+	Serial.print("the current address is: ");
+	Serial.println(LATEST_ADDRESS, HEX);
+	
+	Serial.print("the new address is: ");
+	Serial.println(_address, HEX);
+		//valid address
+	Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
+	Wire.write(0x03);        // sends five bytes to the 0x00 addredss
+	LATEST_ADDRESS = _address;
+	Wire.write(LATEST_ADDRESS);              // sends new address
+	Wire.endTransmission();    // stop transmitting
+	Wire.begin(LATEST_ADDRESS);// start with the new address.
+	}
+	else{
+		Serial.println("Not a valid I2C Address. Needs to be between 0x77 and 0x78.");
+		Serial.print("The address is still:     ");
+		Serial.println(LATEST_ADDRESS, HEX);
+	}
+	
+ 
 #ifdef DEBUG_OUTPUT
-  Serial.print("the current address is: ");
-  Serial.println(LATEST_ADDRESS);
+
 #endif
-  Wire.write(LATEST_ADDRESS);              // sends new address
-  Wire.endTransmission();    // stop transmitting
-  Wire.begin(LATEST_ADDRESS);// start wtih the new address.
+
 }
 /*
     @brief: Requests data from the slave by writing to the
@@ -155,24 +168,14 @@ void changeAddress(int _address) {
     @flags:  none
 */
 void getStatus() {
-  Wire.requestFrom(LATEST_ADDRESS, REGISTER_MAP_SIZE);    // request 4 bytes from slave device #1
-  byte byteCount = 0; //way to know what bytes to throw away.
+  Wire.requestFrom(LATEST_ADDRESS, 1);    // request 1 bytes from slave device LATEST_ADDRESS
+  
   while (Wire.available()) { // slave may send less than requested
-    char c = Wire.read(); // receive a byte as character.
-    byteCount++;
-    if (byteCount == 3) { //we know that the byteCount needs to be 3 because
-      //we know the status Register is the 3rd element in the array
-      if (!(c & 0b00000000)) {
-        Serial.println("relay is off");
-      }
-      else if (c & BIT0) {
-        Serial.println("relay is on");
-      }
-      else {
-        Serial.print("???  ");
-        Serial.println(c);
-      }
-    }
+    char c = Wire.read(); // receive a byte as character. 
+	if(c ==0x01)Serial.println("relay on");
+	else{
+		Serial.print("relay off");
+	}
   }
 #ifdef DEBUG_OUTPUT
   Serial.println();
