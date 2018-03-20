@@ -70,14 +70,6 @@ void loop() {
 	incomingByte = 0;
       changeAddress(0x20); //"a"
       break;
-    case 106:
-	incomingByte = 0;
-      changeAddress(0x19); //"j"
-      break;
-    case 111:
-	incomingByte = 0;
-   changeAddress(0x19); //"o"
-      break;
 	  
     default:
 	incomingByte = 0;
@@ -188,5 +180,4 @@ void getStatus() {
         Serial.println(c);
       }
     }
-  Serial.println();
-}
+
