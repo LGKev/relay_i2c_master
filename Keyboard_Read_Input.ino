@@ -165,9 +165,11 @@ void getStatus() {
     char c = Wire.read(); // receive a byte as character. 
 	if(c ==0x01)Serial.println("relay on");
 	else{
-		Serial.print("relay off");
+		Serial.println("relay off!");
 	}
   }
+  
+  /*
     char c = Wire.read(); // receive a byte as character.
       if (!(c & 0b00000000)) {
         Serial.println("relay is off");
@@ -179,5 +181,6 @@ void getStatus() {
         Serial.print("???  ");
         Serial.println(c);
       }
-    }
+*/  
+  }
 
