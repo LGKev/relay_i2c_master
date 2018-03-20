@@ -12,7 +12,7 @@
 #define BIT0              0b00000001
 
 int incomingByte = 0;   // for incoming serial data
-int LATEST_ADDRESS = 0x18;     //global so address can be changed by user.
+volatile int LATEST_ADDRESS = 0x18;     //global so address can be changed by user.
 byte x = 0;
 
 void setup() {
@@ -24,49 +24,40 @@ void setup() {
 
 void loop() {
 
-  // getStatus();
-
-
   // send data only when you receive data:
   if (Serial.available() > 0) {
     // read the incoming byte:
     incomingByte = Serial.read();
 
     // say what you got:
-#ifdef DEBUG_OUTPUT
     Serial.print("I received: ");
     Serial.println(incomingByte, DEC);
-#endif
+
   }
 
   switch (incomingByte) {
     case 113:
+	incomingByte = 0; // reset, or else infinite loop.
       relayON(); //"q"
       digitalWrite(13, HIGH);
-#ifdef DEBUG_OUTPUT
       Serial.println("ON");
-      incomingByte = 0;
-#endif
       break;
 
     case 112:
+	incomingByte = 0;
       relayOFF(); //"p"
       digitalWrite(13, LOW);
-#ifdef DEBUG_OUTPUT
       Serial.println("OFF");
-      incomingByte = 0;
-#endif
       break;
 
     case 115:
+	incomingByte = 0;
       getStatus(); //"s"
-#ifdef DEBUG_OUTPUT
       Serial.println("Status");
-      incomingByte = 0;
-#endif
       break;
 
     case 97:
+<<<<<<< HEAD
       changeAddress(2); //"a"
 #ifdef DEBUG_OUTPUT
       incomingByte = 0;
@@ -83,8 +74,22 @@ void loop() {
 #ifdef DEBUG_OUTPUT
       incomingByte = 0;
 #endif
+=======
+	incomingByte = 0;
+      changeAddress(0x20); //"a"
       break;
+    case 106:
+	incomingByte = 0;
+      changeAddress(0x19); //"j"
+      break;
+    case 111:
+	incomingByte = 0;
+   changeAddress(0x19); //"o"
+>>>>>>> temp
+      break;
+	  
     default:
+	incomingByte = 0;
       break;
   }
 
@@ -134,6 +139,7 @@ void relayOFF() {
     @flags:  none
 */
 void changeAddress(int _address) {
+<<<<<<< HEAD
 	//check if valid address. 
 	if(_address > 0x07 && _address < 0x78){
 	Serial.print("the current address is: ");
@@ -160,6 +166,13 @@ void changeAddress(int _address) {
 
 #endif
 
+=======
+  Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
+  Wire.write(0x03);        // sends five bytes to the 0x00 address
+  Wire.write(_address);
+  Wire.endTransmission();
+  LATEST_ADDRESS = _address;
+>>>>>>> temp
 }
 /*
     @brief: Requests data from the slave by writing to the
@@ -171,6 +184,7 @@ void getStatus() {
   Wire.requestFrom(LATEST_ADDRESS, 1);    // request 1 bytes from slave device LATEST_ADDRESS
   
   while (Wire.available()) { // slave may send less than requested
+<<<<<<< HEAD
     char c = Wire.read(); // receive a byte as character. 
 	if(c ==0x01)Serial.println("relay on");
 	else{
@@ -178,6 +192,19 @@ void getStatus() {
 	}
   }
 #ifdef DEBUG_OUTPUT
+=======
+    char c = Wire.read(); // receive a byte as character.
+      if (!(c & 0b00000000)) {
+        Serial.println("relay is off");
+      }
+      else if (c & BIT0) {
+        Serial.println("relay is on");
+      }
+      else {
+        Serial.print("???  ");
+        Serial.println(c);
+      }
+    }
+>>>>>>> temp
   Serial.println();
-#endif
 }
