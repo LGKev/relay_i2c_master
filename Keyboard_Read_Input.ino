@@ -130,7 +130,6 @@ void relayOFF() {
     @flags:  none
 */
 void changeAddress(int _address) {
-<<<<<<< HEAD
 	//check if valid address. 
 	if(_address > 0x07 && _address < 0x78){
 	Serial.print("the current address is: ");
@@ -153,18 +152,14 @@ void changeAddress(int _address) {
 	}
 	
  
-#ifdef DEBUG_OUTPUT
-
-#endif
-
-=======
+/*
   Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
   Wire.write(0x03);        // sends five bytes to the 0x00 address
   Wire.write(_address);
   Wire.endTransmission();
   LATEST_ADDRESS = _address;
->>>>>>> temp
-}
+
+ */ }
 /*
     @brief: Requests data from the slave by writing to the
     @input:  none
@@ -175,15 +170,12 @@ void getStatus() {
   Wire.requestFrom(LATEST_ADDRESS, 1);    // request 1 bytes from slave device LATEST_ADDRESS
   
   while (Wire.available()) { // slave may send less than requested
-<<<<<<< HEAD
     char c = Wire.read(); // receive a byte as character. 
 	if(c ==0x01)Serial.println("relay on");
 	else{
 		Serial.print("relay off");
 	}
   }
-#ifdef DEBUG_OUTPUT
-=======
     char c = Wire.read(); // receive a byte as character.
       if (!(c & 0b00000000)) {
         Serial.println("relay is off");
@@ -196,6 +188,5 @@ void getStatus() {
         Serial.println(c);
       }
     }
->>>>>>> temp
   Serial.println();
 }
