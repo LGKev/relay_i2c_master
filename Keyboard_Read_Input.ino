@@ -93,9 +93,17 @@ void loop() {
     @flags:  none
 */
 void relayON() {
-  Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
-  Wire.write(0x01);        // sends five bytes
-  Wire.endTransmission();    // stop transmitting
+	Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
+	//check here for an ACK from the slave, if no ack don't allow change?
+	//if 2 no slave attached. 
+	if(Wire.endTransmission() == 2){
+		Serial.println("Check Connections. No slave attached.");
+	}
+	else{
+	Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
+	Wire.write(0x01);        // sends five bytes
+	Wire.endTransmission();    // stop transmitting
+	}
 }
 /*
     @brief: Starts I2C transmission with a LATEST_ADDRESS, writing to 0x01 register
@@ -106,9 +114,21 @@ void relayON() {
     @flags:  none
 */
 void relayOFF() {
+	
+	Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
+	//check here for an ACK from the slave, if no ack don't allow change?
+	//if 2 no slave attached. 
+	if(Wire.endTransmission() == 2){
+		Serial.println("Check Connections. No slave attached.");
+	}
+	else{
   Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
   Wire.write(0x00);              // sends one byte, set the bit in the ON register on (1) or off (0)
   Wire.endTransmission();    // stop transmitting
+	}
+	
+	
+  
 }
 
 /*
