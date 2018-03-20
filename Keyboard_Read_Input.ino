@@ -57,7 +57,7 @@ void loop() {
       break;
 
     case 97:
-      changeAddress(2); //"a"
+      changeAddress(0x21); //"a"
       incomingByte = 0;
       break;
     case 106:
@@ -68,7 +68,6 @@ void loop() {
       changeAddress(0x18); //"o"
       incomingByte = 0;
 	incomingByte = 0;
-      changeAddress(0x20); //"a"
       break;
 	  
     default:
@@ -131,10 +130,10 @@ void changeAddress(int _address) {
 	Serial.println(_address, HEX);
 		//valid address
 	Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
-	Wire.write(0x03);        // sends five bytes to the 0x00 addredss
+	Wire.write(0x03);        // sends five bytes to the 0x00 address
 	LATEST_ADDRESS = _address;
 	Wire.write(LATEST_ADDRESS);              // sends new address
-	Wire.endTransmission();    // stop transmitting
+	Wire.endTransmission();    // stop transmitting //this looks like it was essential. 
 	Wire.begin(LATEST_ADDRESS);// start with the new address.
 	}
 	else{
@@ -161,6 +160,9 @@ void changeAddress(int _address) {
 void getStatus() {
   Wire.requestFrom(LATEST_ADDRESS, 1);    // request 1 bytes from slave device LATEST_ADDRESS
   
+  Serial.print("you are talking to slave at the address: 0x");
+  Serial.println(LATEST_ADDRESS, HEX);
+  //TODO: maybe report the address? well we would techincally know because thats how we init the i2c write. 
   while (Wire.available()) { // slave may send less than requested
     char c = Wire.read(); // receive a byte as character. 
 	if(c ==0x01)Serial.println("relay on");
@@ -168,19 +170,5 @@ void getStatus() {
 		Serial.println("relay off!");
 	}
   }
-  
-  /*
-    char c = Wire.read(); // receive a byte as character.
-      if (!(c & 0b00000000)) {
-        Serial.println("relay is off");
-      }
-      else if (c & BIT0) {
-        Serial.println("relay is on");
-      }
-      else {
-        Serial.print("???  ");
-        Serial.println(c);
-      }
-*/  
-  }
+ }
 
