@@ -126,31 +126,32 @@ void changeAddress(int _address) {
 	Serial.print("the current address is: ");
 	Serial.println(LATEST_ADDRESS, HEX);
 	
-	Serial.print("the new address is: ");
-	Serial.println(_address, HEX);
 		//valid address
 	Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
+	
+	//check here for an ACK from the slave, if no ack don't allow change?
+	//if 2 no slave attached. 
+	if(Wire.endTransmission() == 2){
+		Serial.println("Check Connections. No slave attached.");
+	}
+	else{
+		Wire.beginTransmission(LATEST_ADDRESS);
+	}
+	
 	Wire.write(0x03);        // sends five bytes to the 0x00 address
 	LATEST_ADDRESS = _address;
 	Wire.write(LATEST_ADDRESS);              // sends new address
 	Wire.endTransmission();    // stop transmitting //this looks like it was essential. 
-	Wire.begin(LATEST_ADDRESS);// start with the new address.
+	Wire.begin(LATEST_ADDRESS);// start with the new address..
+	Serial.print("The new address is: 0x");
+	Serial.println(_address, HEX);
 	}
 	else{
 		Serial.println("Not a valid I2C Address. Needs to be between 0x77 and 0x78.");
 		Serial.print("The address is still:     ");
 		Serial.println(LATEST_ADDRESS, HEX);
 	}
-	
- 
-/*
-  Wire.beginTransmission(LATEST_ADDRESS); // transmit to device #1
-  Wire.write(0x03);        // sends five bytes to the 0x00 address
-  Wire.write(_address);
-  Wire.endTransmission();
-  LATEST_ADDRESS = _address;
-
- */ }
+ }
 /*
     @brief: Requests data from the slave by writing to the
     @input:  none
