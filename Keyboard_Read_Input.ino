@@ -57,24 +57,16 @@ void loop() {
       break;
 
     case 97:
-<<<<<<< HEAD
       changeAddress(2); //"a"
-#ifdef DEBUG_OUTPUT
       incomingByte = 0;
-#endif
       break;
     case 106:
       changeAddress(0x19); //"j"
-#ifdef DEBUG_OUTPUT
       incomingByte = 0;
-#endif
       break;
     case 111:
       changeAddress(0x18); //"o"
-#ifdef DEBUG_OUTPUT
       incomingByte = 0;
-#endif
-=======
 	incomingByte = 0;
       changeAddress(0x20); //"a"
       break;
@@ -85,7 +77,6 @@ void loop() {
     case 111:
 	incomingByte = 0;
    changeAddress(0x19); //"o"
->>>>>>> temp
       break;
 	  
     default:
