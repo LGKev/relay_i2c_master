@@ -8,8 +8,6 @@
 #include <Wire.h>
 
 #define DEBUG_OUTPUT
-#define REGISTER_MAP_SIZE    4
-#define BIT0              0b00000001
 
 int incomingByte = 0;   // for incoming serial data
 volatile int LATEST_ADDRESS = 0x18;     //global so address can be changed by user.
@@ -34,6 +32,9 @@ void loop() {
     Serial.println(incomingByte, DEC);
 
   }
+  
+  
+
 
   switch (incomingByte) {
     case 113:
@@ -67,9 +68,14 @@ void loop() {
     case 111:
       changeAddress(0x18); //"o"
       incomingByte = 0;
-	incomingByte = 0;
       break;
-	  
+
+	case 102:  //f
+	Serial.print("version Number: ");
+	Serial.println(getFirmwareVersion(), 1);
+	incomingByte = 0;
+	break;
+	
     default:
 	incomingByte = 0;
       break;
@@ -86,7 +92,7 @@ void loop() {
 /*========================================================*/
 /*
     @brief: Starts I2C transmission with a LATEST_ADDRESS, writing to 0x01 register
-      wirte a 1 to 0x01 turns on relay
+      write a 1 to 0x01 turns on relay
       write a 0 to 0x01 turns off relay
     @input:  none
     @returns: none
@@ -107,7 +113,7 @@ void relayON() {
 }
 /*
     @brief: Starts I2C transmission with a LATEST_ADDRESS, writing to 0x01 register
-      wirte a 1 to 0x01 turns on relay
+      write a 1 to 0x01 turns on relay
       write a 0 to 0x01 turns off relay
     @input:  none
     @returns: none
@@ -129,6 +135,26 @@ void relayOFF() {
 	
 	
   
+}
+
+float getFirmwareVersion(){
+	
+	Wire.beginTransmission(LATEST_ADDRESS);
+	Wire.write(0x04); //command for firmware
+	Wire.endTransmission();
+	//request data
+	Wire.requestFrom(LATEST_ADDRESS, 4); //4 BYTES for the [float] Version Number
+	
+	unsigned long versionNumber = 0;
+	byte counter = 0; // keep track of how many bytes we have actually gotten.
+	while (Wire.available() > 4) { // slave must sent the 4 bytes, 3 or 4? i think 3 or 4>=
+	if(counter < 4){
+    versionNumber |= Wire.read(); // receive a byte, and logical or into the version number
+	versionNumber = versionNumber << 8; //shift over 1 byte (8 bits)
+	counter++;
+		}
+	} //the while loop should run 4 times
+	return(versionNumber);
 }
 
 /*
@@ -183,7 +209,7 @@ void getStatus() {
   
   Serial.print("you are talking to slave at the address: 0x");
   Serial.println(LATEST_ADDRESS, HEX);
-  //TODO: maybe report the address? well we would techincally know because thats how we init the i2c write. 
+  //TODO: maybe report the address? well we would technically know because thats how we init the i2c write. 
   while (Wire.available()) { // slave may send less than requested
     char c = Wire.read(); // receive a byte as character. 
 	if(c ==0x01)Serial.println("relay on");
